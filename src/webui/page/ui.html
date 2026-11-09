@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en" class="preview">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>Coretools+ UI v3</title>
+    <style>
+      /* ===== Coretools+ HTML UI v3 — 1:1 remake of the in-game .js menus =====
+   * Ground truth: reference screenshot measurements (1281x591) +
+   * test/launcher_premium_ship.js (labels via String.fromCharCode, tag colors:
+   * FPS=C855CC55 green / CT=C8FFFFFF white, font 20, alpha 200;
+   * sliders -10..10 no value display; toggle2 checkboxes; debug_menu assets).
+   * Lilita One embedded base64 (offline WebView-safe, no network needed).
+   * Fixed 1281x591 stage scaled to fit any screen (JS sets --s).
+   * Production: <html> without class="preview" => transparent WebView overlay.
+   * Bridge: Java addJavascriptInterface(obj,"CTBridge"); JS side uses CTMenu.sync().
+   */
+      @font-face {
+        font-family: "Lilita One";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(data:font/woff2;base64,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)
+          format("woff2");
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: transparent;
+        font-family: "Lilita One", "Supercell Text", "Arial Rounded MT Bold", Arial, sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      html.preview body {
+        background: url(bg.jpg) center/cover no-repeat;
+      }
+      #stage {
+        -webkit-text-stroke: 0.75px currentColor;
+      }
+      #stage {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 1281px;
+        height: 591px;
+        transform: translate(-50%, -50%) scale(var(--s, 1));
+        transform-origin: center;
+      }
+      .t {
+        text-shadow:
+          -1px -1px 0 #14161c,
+          1px -1px 0 #14161c,
+          -1px 1px 0 #14161c,
+          1px 1px 0 #14161c,
+          0 2px 2px rgba(0, 0, 0, 0.45);
+      }
+
+      /* ===== neutral SC beveled button (gray) ===== */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2.5px solid #565a60;
+        border-radius: 7px;
+        cursor: pointer;
+        background: #b0b0b0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        color: #efece3;
+      }
+      .btn:active,
+      .btn.pressed {
+        box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.5);
+        filter: brightness(0.86);
+      }
+
+      /* ===== HUD tags (top-left) ===== */
+      #hud {
+        position: absolute;
+        left: 25px;
+        top: 0px;
+        line-height: 29px;
+        z-index: 5;
+        pointer-events: none;
+      }
+      #hud div {
+        font-size: 23px;
+      }
+      .w {
+        color: rgba(255, 255, 255, 0.66);
+      }
+      .g {
+        color: rgba(85, 204, 85, 0.66);
+      }
+      #hLic {
+        font-size: 17px;
+        line-height: 26px;
+      }
+
+      /* ===== DPS display (top-right) ===== */
+      #dps {
+        position: absolute;
+        left: 1000px;
+        top: 40px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        z-index: 5;
+        pointer-events: none;
+      }
+      #dps .cap {
+        font-size: 18px;
+        color: #b9c2c9;
+      }
+      #dps .gem {
+        width: 26px;
+        height: 26px;
+        background: linear-gradient(135deg, #7db9ff, #2f6fd6);
+        border: 2px solid #1d4b9e;
+        transform: rotate(45deg);
+        border-radius: 4px;
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+      }
+      #dps .v {
+        font-size: 21px;
+        color: #efece3;
+      }
+
+      /* ===== Einstellungen (top-center) + D (bottom-left) ===== */
+      #einst {
+        position: absolute;
+        left: 589px;
+        top: 8px;
+        width: 102px;
+        height: 46px;
+        font-size: 15px;
+        white-space: nowrap;
+        z-index: 6;
+        background: rgba(200, 200, 200, 0.22);
+        border: 2.5px solid #e8e4da;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      }
+      #dbtn {
+        position: absolute;
+        left: 34px;
+        bottom: 24px;
+        width: 88px;
+        height: 54px;
+        border-radius: 0px;
+        font-size: 30px;
+        z-index: 6;
+        border: none;
+        background: rgba(30, 30, 30, 0.55);
+        color: #f5e8a0;
+      }
+
+      /* ===== MAIN MENU (center) ===== */
+      #main {
+        position: absolute;
+        left: 250px;
+        top: 82px;
+        width: 525px;
+        height: 454px;
+        background: rgba(30, 30, 30, 0.85);
+        border: 1.5px solid #444;
+        border-radius: 0px;
+        box-shadow: 0 7px 22px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+      }
+      #pages {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 41px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-sizing: border-box;
+      }
+      #pages .btn {
+        width: 102px;
+        height: 46px;
+        font-size: 23px;
+        background: rgba(200, 200, 200, 0.22);
+        border: 2.5px solid #e8e4da;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      }
+      .pg {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 72px;
+        bottom: 6px;
+        display: none;
+      }
+      .pg.on {
+        display: block;
+      }
+      .srow {
+        position: absolute;
+        left: 38px;
+        width: 439px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .srow .lb {
+        width: 122px;
+        text-align: right;
+        font-size: 22px;
+        color: #efece3;
+      }
+      .sl {
+        position: relative;
+        width: 258px;
+        height: 18px;
+        border-radius: 999px;
+        background: rgba(216, 216, 216, 0.4);
+        border: 1.5px solid #000;
+        cursor: pointer;
+      }
+      .sl .knob {
+        position: absolute;
+        top: 50%;
+        width: 30px;
+        height: 30px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 0 2.5px rgba(0, 0, 0, 0.8);
+      }
+      #modules {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 182px;
+        text-align: center;
+        font-size: 28px;
+        color: #efece3;
+      }
+      .mrow {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 330px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .cb {
+        position: relative;
+        width: 37px;
+        height: 37px;
+        cursor: pointer;
+        flex: 0 0 auto;
+      }
+      .cb svg {
+        display: block;
+        width: 37px;
+        height: 37px;
+      }
+      .cbox {
+        fill: #141414;
+        stroke: #1d1d1d;
+        stroke-width: 7;
+      }
+      .cbin {
+        fill: #ef6c00;
+        opacity: 0;
+      }
+      .cbchk {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0;
+      }
+      .cb.on .cbin,
+      .cb.on .cbchk {
+        opacity: 1;
+      }
+      .mlabel {
+        font-size: 21px;
+        color: #d32f2f;
+      }
+      #gear {
+        position: absolute;
+        right: -28px;
+        bottom: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 9px;
+        cursor: pointer;
+        border: 3px solid #14406e;
+        background: #1e5fa8;
+        box-shadow:
+          inset 0 3px 0 rgba(255, 255, 255, 0.5),
+          0 4px 7px rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #gear svg {
+        width: 37px;
+        height: 37px;
+        fill: #fff;
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+      }
+      #wip {
+        padding: 90px 0;
+        text-align: center;
+        font-size: 23px;
+        color: #ffd24d;
+      }
+
+      /* ===== DEBUG MENU (right) ===== */
+      #dbg {
+        position: absolute;
+        left: 972px;
+        top: 2px;
+        width: 292px;
+        min-height: 587px;
+        max-height: 587px;
+        overflow-y: auto;
+        background: rgba(30, 30, 30, 0.85);
+        border: 1.5px solid #444;
+        border-radius: 0px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+        padding: 12px 11px 14px;
+        z-index: 10;
+        box-sizing: border-box;
+      }
+      #dbgHead {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      #dbgTitle {
+        flex: 1;
+        text-align: center;
+        font-size: 26px;
+        color: #efece3;
+      }
+      #dbgX {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        border: 1.5px solid #571509;
+        cursor: pointer;
+        background: #a93226;
+        color: #efece3;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        font-family: Arial;
+      }
+      #dbgVer {
+        text-align: center;
+        font-size: 14px;
+        color: #b71c1c;
+        margin: 3px 0 12px;
+      }
+      #dtabs {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      #dtabs .dtab {
+        width: 44px;
+        height: 34px;
+        border-radius: 0px;
+        font-size: 16px;
+        color: #efece3;
+        border: none;
+        background: #262626;
+        font-family: Arial;
+        font-weight: 700;
+      }
+      #dtabs .dtab.pressed {
+        filter: brightness(0.8);
+      }
+      .cat {
+        height: 46px;
+        margin: 11px 0;
+        border-radius: 0px;
+        background: #262626;
+        border-bottom: 1px solid #3d3d3d;
+        display: flex;
+        align-items: center;
+        padding-left: 12px;
+        font-size: 20px;
+        color: #efece3;
+        cursor: pointer;
+        box-sizing: border-box;
+      }
+      .ditems {
+        display: none;
+      }
+      .cat.open + .ditems {
+        display: block;
+      }
+      .ditem {
+        height: 47px;
+        margin: 11px 0;
+        border-radius: 0px;
+        background: #4d4d4d;
+        display: flex;
+        align-items: center;
+        padding-left: 25px;
+        font-size: 20px;
+        color: #efece3;
+        cursor: pointer;
+      }
+      .ditem.sel {
+        background: #4d4d4d;
+      }
+
+      .hline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2.5px;
+        background: #000;
+        z-index: 1;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="hud">
+        <div class="g t" id="hFps">FPS: 60</div>
+        <div class="w t" id="hCt">@CT-prodbuild-20267356827-2026-22:08</div>
+        <div class="g t" id="hCode">Code: 882480</div>
+        <div class="w t" id="hLic">activated</div>
+      </div>
+
+      <div class="btn t" id="einst">Einstellungen</div>
+      <div class="btn t" id="dbtn">D</div>
+
+      <!-- ===== MAIN MENU ===== -->
+      <div id="main" class="hidden">
+        <div class="hline" style="top: 33px"></div>
+        <div id="pages">
+          <div class="btn t pressed" data-page="0">Visual</div>
+          <div class="btn t" data-page="1">Exper.</div>
+        </div>
+
+        <div class="pg on" id="page0">
+          <div class="srow" style="top: 14px">
+            <div class="lb t">angle</div>
+            <div class="sl" data-sl="angle"><div class="knob"></div></div>
+          </div>
+          <div class="srow" style="top: 66px">
+            <div class="lb t">aim lead</div>
+            <div class="sl" data-sl="aim lead"><div class="knob"></div></div>
+          </div>
+          <div class="srow" style="top: 118px">
+            <div class="lb t">dodge dirs</div>
+            <div class="sl" data-sl="dodge dirs"><div class="knob"></div></div>
+          </div>
+
+          <div id="modules" class="t" style="top: 182px">Modules</div>
+          <div class="mrow" style="top: 204px">
+            <div class="cb" data-tg="0">
+              <svg viewBox="0 0 100 100">
+                <path
+                  class="cbox"
+                  d="M 96.5,50.0 L 96.4,62.3 L 96.0,68.3 L 95.3,72.9 L 94.4,76.9 L 93.3,80.3 L 91.8,83.2 L 90.1,85.9 L 88.1,88.1 L 85.9,90.1 L 83.2,91.8 L 80.3,93.3 L 76.9,94.4 L 72.9,95.3 L 68.3,96.0 L 62.3,96.4 L 50.0,96.5 L 37.7,96.4 L 31.7,96.0 L 27.1,95.3 L 23.1,94.4 L 19.7,93.3 L 16.8,91.8 L 14.1,90.1 L 11.9,88.1 L 9.9,85.9 L 8.2,83.2 L 6.7,80.3 L 5.6,76.9 L 4.7,72.9 L 4.0,68.3 L 3.6,62.3 L 3.5,50.0 L 3.6,37.7 L 4.0,31.7 L 4.7,27.1 L 5.6,23.1 L 6.7,19.7 L 8.2,16.8 L 9.9,14.1 L 11.9,11.9 L 14.1,9.9 L 16.8,8.2 L 19.7,6.7 L 23.1,5.6 L 27.1,4.7 L 31.7,4.0 L 37.7,3.6 L 50.0,3.5 L 62.3,3.6 L 68.3,4.0 L 72.9,4.7 L 76.9,5.6 L 80.3,6.7 L 83.2,8.2 L 85.9,9.9 L 88.1,11.9 L 90.1,14.1 L 91.8,16.8 L 93.3,19.7 L 94.4,23.1 L 95.3,27.1 L 96.0,31.7 L 96.4,37.7 Z"
+                />
+                <path
+                  class="cbin"
+                  d="M 82.5,50.0 L 82.4,58.6 L 82.1,62.8 L 81.7,66.0 L 81.1,68.8 L 80.2,71.1 L 79.2,73.2 L 78.1,75.1 L 76.7,76.7 L 75.1,78.1 L 73.2,79.2 L 71.1,80.2 L 68.8,81.1 L 66.0,81.7 L 62.8,82.1 L 58.6,82.4 L 50.0,82.5 L 41.4,82.4 L 37.2,82.1 L 34.0,81.7 L 31.2,81.1 L 28.9,80.2 L 26.8,79.2 L 24.9,78.1 L 23.3,76.7 L 21.9,75.1 L 20.8,73.2 L 19.8,71.1 L 18.9,68.8 L 18.3,66.0 L 17.9,62.8 L 17.6,58.6 L 17.5,50.0 L 17.6,41.4 L 17.9,37.2 L 18.3,34.0 L 18.9,31.2 L 19.8,28.9 L 20.8,26.8 L 21.9,24.9 L 23.3,23.3 L 24.9,21.9 L 26.8,20.8 L 28.9,19.8 L 31.2,18.9 L 34.0,18.3 L 37.2,17.9 L 41.4,17.6 L 50.0,17.5 L 58.6,17.6 L 62.8,17.9 L 66.0,18.3 L 68.8,18.9 L 71.1,19.8 L 73.2,20.8 L 75.1,21.9 L 76.7,23.3 L 78.1,24.9 L 79.2,26.8 L 80.2,28.9 L 81.1,31.2 L 81.7,34.0 L 82.1,37.2 L 82.4,41.4 Z"
+                />
+                <polyline class="cbchk" points="36,53 47,64 65,42" />
+              </svg>
+            </div>
+            <div class="mlabel t">dodgebot --ignore</div>
+          </div>
+          <div class="mrow" style="top: 246px">
+            <div class="cb" data-tg="2">
+              <svg viewBox="0 0 100 100">
+                <path
+                  class="cbox"
+                  d="M 96.5,50.0 L 96.4,62.3 L 96.0,68.3 L 95.3,72.9 L 94.4,76.9 L 93.3,80.3 L 91.8,83.2 L 90.1,85.9 L 88.1,88.1 L 85.9,90.1 L 83.2,91.8 L 80.3,93.3 L 76.9,94.4 L 72.9,95.3 L 68.3,96.0 L 62.3,96.4 L 50.0,96.5 L 37.7,96.4 L 31.7,96.0 L 27.1,95.3 L 23.1,94.4 L 19.7,93.3 L 16.8,91.8 L 14.1,90.1 L 11.9,88.1 L 9.9,85.9 L 8.2,83.2 L 6.7,80.3 L 5.6,76.9 L 4.7,72.9 L 4.0,68.3 L 3.6,62.3 L 3.5,50.0 L 3.6,37.7 L 4.0,31.7 L 4.7,27.1 L 5.6,23.1 L 6.7,19.7 L 8.2,16.8 L 9.9,14.1 L 11.9,11.9 L 14.1,9.9 L 16.8,8.2 L 19.7,6.7 L 23.1,5.6 L 27.1,4.7 L 31.7,4.0 L 37.7,3.6 L 50.0,3.5 L 62.3,3.6 L 68.3,4.0 L 72.9,4.7 L 76.9,5.6 L 80.3,6.7 L 83.2,8.2 L 85.9,9.9 L 88.1,11.9 L 90.1,14.1 L 91.8,16.8 L 93.3,19.7 L 94.4,23.1 L 95.3,27.1 L 96.0,31.7 L 96.4,37.7 Z"
+                />
+                <path
+                  class="cbin"
+                  d="M 82.5,50.0 L 82.4,58.6 L 82.1,62.8 L 81.7,66.0 L 81.1,68.8 L 80.2,71.1 L 79.2,73.2 L 78.1,75.1 L 76.7,76.7 L 75.1,78.1 L 73.2,79.2 L 71.1,80.2 L 68.8,81.1 L 66.0,81.7 L 62.8,82.1 L 58.6,82.4 L 50.0,82.5 L 41.4,82.4 L 37.2,82.1 L 34.0,81.7 L 31.2,81.1 L 28.9,80.2 L 26.8,79.2 L 24.9,78.1 L 23.3,76.7 L 21.9,75.1 L 20.8,73.2 L 19.8,71.1 L 18.9,68.8 L 18.3,66.0 L 17.9,62.8 L 17.6,58.6 L 17.5,50.0 L 17.6,41.4 L 17.9,37.2 L 18.3,34.0 L 18.9,31.2 L 19.8,28.9 L 20.8,26.8 L 21.9,24.9 L 23.3,23.3 L 24.9,21.9 L 26.8,20.8 L 28.9,19.8 L 31.2,18.9 L 34.0,18.3 L 37.2,17.9 L 41.4,17.6 L 50.0,17.5 L 58.6,17.6 L 62.8,17.9 L 66.0,18.3 L 68.8,18.9 L 71.1,19.8 L 73.2,20.8 L 75.1,21.9 L 76.7,23.3 L 78.1,24.9 L 79.2,26.8 L 80.2,28.9 L 81.1,31.2 L 81.7,34.0 L 82.1,37.2 L 82.4,41.4 Z"
+                />
+                <polyline class="cbchk" points="36,53 47,64 65,42" />
+              </svg>
+            </div>
+            <div class="mlabel t">Killaura</div>
+          </div>
+          <div class="mrow" style="top: 288px">
+            <div class="cb" data-tg="6">
+              <svg viewBox="0 0 100 100">
+                <path
+                  class="cbox"
+                  d="M 96.5,50.0 L 96.4,62.3 L 96.0,68.3 L 95.3,72.9 L 94.4,76.9 L 93.3,80.3 L 91.8,83.2 L 90.1,85.9 L 88.1,88.1 L 85.9,90.1 L 83.2,91.8 L 80.3,93.3 L 76.9,94.4 L 72.9,95.3 L 68.3,96.0 L 62.3,96.4 L 50.0,96.5 L 37.7,96.4 L 31.7,96.0 L 27.1,95.3 L 23.1,94.4 L 19.7,93.3 L 16.8,91.8 L 14.1,90.1 L 11.9,88.1 L 9.9,85.9 L 8.2,83.2 L 6.7,80.3 L 5.6,76.9 L 4.7,72.9 L 4.0,68.3 L 3.6,62.3 L 3.5,50.0 L 3.6,37.7 L 4.0,31.7 L 4.7,27.1 L 5.6,23.1 L 6.7,19.7 L 8.2,16.8 L 9.9,14.1 L 11.9,11.9 L 14.1,9.9 L 16.8,8.2 L 19.7,6.7 L 23.1,5.6 L 27.1,4.7 L 31.7,4.0 L 37.7,3.6 L 50.0,3.5 L 62.3,3.6 L 68.3,4.0 L 72.9,4.7 L 76.9,5.6 L 80.3,6.7 L 83.2,8.2 L 85.9,9.9 L 88.1,11.9 L 90.1,14.1 L 91.8,16.8 L 93.3,19.7 L 94.4,23.1 L 95.3,27.1 L 96.0,31.7 L 96.4,37.7 Z"
+                />
+                <path
+                  class="cbin"
+                  d="M 82.5,50.0 L 82.4,58.6 L 82.1,62.8 L 81.7,66.0 L 81.1,68.8 L 80.2,71.1 L 79.2,73.2 L 78.1,75.1 L 76.7,76.7 L 75.1,78.1 L 73.2,79.2 L 71.1,80.2 L 68.8,81.1 L 66.0,81.7 L 62.8,82.1 L 58.6,82.4 L 50.0,82.5 L 41.4,82.4 L 37.2,82.1 L 34.0,81.7 L 31.2,81.1 L 28.9,80.2 L 26.8,79.2 L 24.9,78.1 L 23.3,76.7 L 21.9,75.1 L 20.8,73.2 L 19.8,71.1 L 18.9,68.8 L 18.3,66.0 L 17.9,62.8 L 17.6,58.6 L 17.5,50.0 L 17.6,41.4 L 17.9,37.2 L 18.3,34.0 L 18.9,31.2 L 19.8,28.9 L 20.8,26.8 L 21.9,24.9 L 23.3,23.3 L 24.9,21.9 L 26.8,20.8 L 28.9,19.8 L 31.2,18.9 L 34.0,18.3 L 37.2,17.9 L 41.4,17.6 L 50.0,17.5 L 58.6,17.6 L 62.8,17.9 L 66.0,18.3 L 68.8,18.9 L 71.1,19.8 L 73.2,20.8 L 75.1,21.9 L 76.7,23.3 L 78.1,24.9 L 79.2,26.8 L 80.2,28.9 L 81.1,31.2 L 81.7,34.0 L 82.1,37.2 L 82.4,41.4 Z"
+                />
+                <polyline class="cbchk" points="36,53 47,64 65,42" />
+              </svg>
+            </div>
+            <div class="mlabel t">aimbot</div>
+          </div>
+          <div class="mrow" style="top: 330px">
+            <div class="cb" data-tg="1">
+              <svg viewBox="0 0 100 100">
+                <path
+                  class="cbox"
+                  d="M 96.5,50.0 L 96.4,62.3 L 96.0,68.3 L 95.3,72.9 L 94.4,76.9 L 93.3,80.3 L 91.8,83.2 L 90.1,85.9 L 88.1,88.1 L 85.9,90.1 L 83.2,91.8 L 80.3,93.3 L 76.9,94.4 L 72.9,95.3 L 68.3,96.0 L 62.3,96.4 L 50.0,96.5 L 37.7,96.4 L 31.7,96.0 L 27.1,95.3 L 23.1,94.4 L 19.7,93.3 L 16.8,91.8 L 14.1,90.1 L 11.9,88.1 L 9.9,85.9 L 8.2,83.2 L 6.7,80.3 L 5.6,76.9 L 4.7,72.9 L 4.0,68.3 L 3.6,62.3 L 3.5,50.0 L 3.6,37.7 L 4.0,31.7 L 4.7,27.1 L 5.6,23.1 L 6.7,19.7 L 8.2,16.8 L 9.9,14.1 L 11.9,11.9 L 14.1,9.9 L 16.8,8.2 L 19.7,6.7 L 23.1,5.6 L 27.1,4.7 L 31.7,4.0 L 37.7,3.6 L 50.0,3.5 L 62.3,3.6 L 68.3,4.0 L 72.9,4.7 L 76.9,5.6 L 80.3,6.7 L 83.2,8.2 L 85.9,9.9 L 88.1,11.9 L 90.1,14.1 L 91.8,16.8 L 93.3,19.7 L 94.4,23.1 L 95.3,27.1 L 96.0,31.7 L 96.4,37.7 Z"
+                />
+                <path
+                  class="cbin"
+                  d="M 82.5,50.0 L 82.4,58.6 L 82.1,62.8 L 81.7,66.0 L 81.1,68.8 L 80.2,71.1 L 79.2,73.2 L 78.1,75.1 L 76.7,76.7 L 75.1,78.1 L 73.2,79.2 L 71.1,80.2 L 68.8,81.1 L 66.0,81.7 L 62.8,82.1 L 58.6,82.4 L 50.0,82.5 L 41.4,82.4 L 37.2,82.1 L 34.0,81.7 L 31.2,81.1 L 28.9,80.2 L 26.8,79.2 L 24.9,78.1 L 23.3,76.7 L 21.9,75.1 L 20.8,73.2 L 19.8,71.1 L 18.9,68.8 L 18.3,66.0 L 17.9,62.8 L 17.6,58.6 L 17.5,50.0 L 17.6,41.4 L 17.9,37.2 L 18.3,34.0 L 18.9,31.2 L 19.8,28.9 L 20.8,26.8 L 21.9,24.9 L 23.3,23.3 L 24.9,21.9 L 26.8,20.8 L 28.9,19.8 L 31.2,18.9 L 34.0,18.3 L 37.2,17.9 L 41.4,17.6 L 50.0,17.5 L 58.6,17.6 L 62.8,17.9 L 66.0,18.3 L 68.8,18.9 L 71.1,19.8 L 73.2,20.8 L 75.1,21.9 L 76.7,23.3 L 78.1,24.9 L 79.2,26.8 L 80.2,28.9 L 81.1,31.2 L 81.7,34.0 L 82.1,37.2 L 82.4,41.4 Z"
+                />
+                <polyline class="cbchk" points="36,53 47,64 65,42" />
+              </svg>
+            </div>
+            <div class="mlabel t">Outline</div>
+          </div>
+        </div>
+
+        <div class="pg" id="page1"><div id="wip" class="t">work in progress!</div></div>
+        <div class="pg" id="cameraSettings">
+          <div class="srow" style="top: 14px">
+            <div class="lb t">X</div>
+            <div class="sl" data-sl="camera X"><div class="knob"></div></div>
+          </div>
+          <div class="srow" style="top: 84px">
+            <div class="lb t">Y</div>
+            <div class="sl" data-sl="camera Y"><div class="knob"></div></div>
+          </div>
+          <div class="srow" style="top: 154px">
+            <div class="lb t">Z</div>
+            <div class="sl" data-sl="camera Z"><div class="knob"></div></div>
+          </div>
+        </div>
+        <div id="gear" title="Einstellungen">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19.4 13c.04-.32.06-.66.06-1s-.02-.68-.06-1l2.1-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.3 7.3 0 0 0-1.73-1l-.37-2.65A.5.5 0 0 0 13.93 2h-4a.5.5 0 0 0-.5.42L9.06 5.07a7.3 7.3 0 0 0-1.73 1l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64L4.46 11c-.04.32-.06.66-.06 1s.02.68.06 1l-2.1 1.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.4.31.6.22l2.49-1c.52.4 1.1.73 1.73 1l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65a7.3 7.3 0 0 0 1.73-1l2.49 1c.2.09.47 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64L19.4 13Zm-7.47 2.6A2.6 2.6 0 1 1 14.53 13 2.6 2.6 0 0 1 11.93 15.6Z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <!-- ===== DEBUG MENU ===== -->
+      <div id="dbg" class="hidden">
+        <div id="dbgHead">
+          <div id="dbgTitle" class="t">Debug Menu</div>
+          <div id="dbgX">X</div>
+        </div>
+        <div id="dbgVer" class="t">t.me/coretools7</div>
+        <div class="hline" style="top: 64px"></div>
+        <div id="dtabs">
+          <div class="btn dtab">Mis</div>
+          <div class="btn dtab">Acc</div>
+          <div class="btn dtab">Bat</div>
+          <div class="btn dtab">Fun</div>
+          <div class="btn dtab">Gfx</div>
+          <div class="btn dtab">Srv</div>
+        </div>
+        <div class="cat t"><span style="display: inline-block; width: 18px">+</span>Misc</div>
+        <div class="ditems">
+          <div class="ditem t" data-action="item">Go Tutorial</div>
+          <div class="ditem t" data-action="item">Brawler Outline</div>
+          <div class="ditem t" data-action="item">Floater</div>
+          <div class="ditem t" data-action="item">Test Misc</div>
+          <div class="ditem t" data-action="item">Main menu</div>
+          <div class="ditem t" data-action="item">Stage Probe</div>
+        </div>
+        <div class="cat t"><span style="display: inline-block; width: 18px">+</span>Battle</div>
+        <div class="ditems">
+          <div class="ditem t" data-action="item">FPS Unlock</div>
+          <div class="ditem t" data-action="item">Camera Mode</div>
+          <div class="ditem t" data-action="item">Spectators 69</div>
+          <div class="ditem t" data-action="item">Chat Spam</div>
+          <div class="ditem t" data-action="item">Killaura</div>
+          <div class="ditem t" data-action="item">Aimbot</div>
+        </div>
+        <div class="cat t open">
+          <span style="display: inline-block; width: 18px">&ndash;</span>Menu Styles
+        </div>
+        <div class="ditems">
+          <div class="ditem t sel" data-action="style">coretools (default)</div>
+          <div class="ditem t" data-action="style">Bsre1 (old)</div>
+          <div class="ditem t" data-action="style">Switchgear+ (new)</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============ scale-to-fit (keeps 1:1 layout on any screen) ============ */
+      function fit() {
+        var s = Math.min(innerWidth / 1281, innerHeight / 591);
+        document.getElementById("stage").style.setProperty("--s", s);
+      }
+      addEventListener("resize", fit);
+      fit();
+
+      /* ============ Coretools bridge (Java <-> HTML) ============ */
+      var CTBridge = window.CTBridge || null;
+      function ctSend(msg) {
+        msg.ts = Date.now();
+        try {
+          if (CTBridge) {
+            CTBridge.post(JSON.stringify(msg));
+            return;
+          }
+        } catch (e0) {}
+        try {
+          location.href = "ct://" + btoa(unescape(encodeURIComponent(JSON.stringify(msg))));
+        } catch (e) {}
+      }
+      function ctRaw(m) {
+        try {
+          if (window.CTBridge) {
+            CTBridge.post(m);
+            return;
+          }
+        } catch (e0) {}
+        try {
+          location.href = "ct://" + m;
+        } catch (e) {}
+      }
+      window.CTMenu = {
+        sync: function (s) {
+          if (!s) return;
+          if (s.fps !== undefined) document.getElementById("hFps").textContent = "FPS: " + s.fps;
+          if (s.ctTag !== undefined) document.getElementById("hCt").textContent = s.ctTag;
+          if (s.code !== undefined)
+            document.getElementById("hCode").textContent = "Code: " + s.code;
+          if (s.lic !== undefined) document.getElementById("hLic").textContent = s.lic;
+          if (s.toggles) for (var id in s.toggles) setToggle(id, !!s.toggles[id], true);
+          if (s.sliders) for (var n in s.sliders) setSlider(n, +s.sliders[n], true);
+          if (s.style && (s.styleTs === undefined || s.styleTs >= styleChangedAt))
+            setStyle(s.style, true);
+          if (s.page !== undefined) setPage(s.page, true);
+          if (s.showMain !== undefined) {
+            document
+              .getElementById("main")
+              .classList.toggle("hidden", !s.showMain || activeStyle !== "coretools");
+          }
+          if (s.showDbg !== undefined)
+            document.getElementById("dbg").classList.toggle("hidden", !s.showDbg);
+        },
+        goProd: function () {
+          document.documentElement.classList.remove("preview");
+        },
+      };
+
+      /* ============ interactions ============ */
+      function q(sel) {
+        return document.querySelector(sel);
+      }
+      function qa(sel) {
+        return Array.prototype.slice.call(document.querySelectorAll(sel));
+      }
+
+      var settingsOpen = false,
+        selectedPage = 0,
+        activeStyle = "coretools",
+        styleChangedAt = 0;
+      function setPage(i, silent) {
+        selectedPage = +i;
+        qa("#pages .btn").forEach(function (b) {
+          b.classList.toggle("pressed", +b.dataset.page === +i);
+        });
+        document.getElementById("page0").classList.toggle("on", +i === 0);
+        document.getElementById("page1").classList.toggle("on", +i === 1);
+        if (!silent) ctSend({ t: "page", name: +i === 0 ? "Visual" : "Exper." });
+      }
+      qa("#pages .btn").forEach(function (b) {
+        b.addEventListener("click", function () {
+          setPage(+b.dataset.page);
+        });
+      });
+
+      /* sliders: -10..10 (matches _BbBbF019(sl2,-10,10)), no value shown in-game */
+      var SL_MIN = -10,
+        SL_MAX = 10;
+      function setSlider(name, v, silent) {
+        v = Math.max(SL_MIN, Math.min(SL_MAX, v));
+        var sl = q('.sl[data-sl="' + name + '"]');
+        if (!sl) return;
+        sl.querySelector(".knob").style.left = ((v - SL_MIN) / (SL_MAX - SL_MIN)) * 100 + "%";
+      }
+      qa(".sl").forEach(function (sl) {
+        var name = sl.dataset.sl,
+          drag = false;
+        function fromEvent(ev) {
+          var r = sl.getBoundingClientRect();
+          var x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+          var p = Math.max(0, Math.min(1, x / r.width));
+          var v = Math.round(SL_MIN + p * (SL_MAX - SL_MIN));
+          setSlider(name, v);
+          ctSend({ t: "slider", name: name, v: v });
+        }
+        sl.addEventListener("pointerdown", function (ev) {
+          drag = true;
+          try {
+            sl.setPointerCapture(ev.pointerId);
+          } catch (e) {}
+          fromEvent(ev);
+        });
+        sl.addEventListener("pointermove", function (ev) {
+          if (drag) fromEvent(ev);
+        });
+        sl.addEventListener("pointerup", function () {
+          drag = false;
+        });
+        sl.addEventListener("pointercancel", function () {
+          drag = false;
+        });
+        setSlider(name, 0, true);
+      });
+
+      /* toggles: ids 0=dodgebot --ignore, 1=Outline, 2=Killaura, 6=aimbot (CAM_PAGE_TOGGLE_STATE) */
+      function setToggle(id, on, silent) {
+        var cb = q('.cb[data-tg="' + id + '"]');
+        if (cb) cb.classList.toggle("on", !!on);
+      }
+      qa(".cb").forEach(function (cb) {
+        cb.addEventListener("click", function () {
+          var on = !cb.classList.contains("on");
+          setToggle(cb.dataset.tg, on);
+          ctSend({ t: "toggle", id: +cb.dataset.tg, on: on });
+        });
+      });
+
+      /* debug menu */
+      qa("#dtabs .dtab").forEach(function (tb) {
+        tb.addEventListener("click", function () {
+          // Decompiled mini actions: only Mis (0) and Bat (2) toggle a category.
+          if (tb.textContent === "Mis") qa(".cat")[0].click();
+          else if (tb.textContent === "Bat") qa(".cat")[1].click();
+          ctSend({ t: "dbgtab", tab: tb.textContent });
+        });
+      });
+      qa(".cat").forEach(function (cat) {
+        cat.addEventListener("click", function () {
+          var open = cat.classList.toggle("open");
+          var sign = cat.firstElementChild;
+          sign.textContent = open ? "\u2013" : "+";
+          ctSend({ t: "dcat", name: cat.textContent.replace(/^[+\u2013]\s*/, ""), open: open });
+        });
+      });
+      function setStyle(name, silent) {
+        var styles = {
+          "coretools (default)": "coretools",
+          "Switchgear+ (new)": "switchgear",
+          "Bsre1 (old)": "bsre1",
+        };
+        var next = styles[name] || name;
+        if (["coretools", "switchgear", "bsre1"].indexOf(next) < 0) return;
+        if (next !== activeStyle) {
+          setSettings(false, true);
+          q("#main").classList.add("hidden");
+        }
+        activeStyle = next;
+        if (!silent) styleChangedAt = Date.now();
+        qa('.ditem[data-action="style"]').forEach(function (it) {
+          it.classList.toggle("sel", styles[it.textContent] === activeStyle);
+        });
+      }
+      qa(".ditem").forEach(function (it) {
+        it.addEventListener("click", function () {
+          var type = it.dataset.action;
+          if (type === "style") setStyle(it.textContent);
+          ctSend({ t: type, name: it.textContent });
+        });
+      });
+
+      /* actions */
+      function setSettings(open, silent) {
+        settingsOpen = open;
+        q("#pages").classList.toggle("hidden", open);
+        q("#cameraSettings").classList.toggle("on", open);
+        q("#page0").classList.toggle("on", !open && selectedPage === 0);
+        q("#page1").classList.toggle("on", !open && selectedPage === 1);
+        q("#gear").title = open ? "Back" : "Einstellungen";
+        if (!open)
+          ["X", "Y", "Z"].forEach(function (axis) {
+            setSlider("camera " + axis, 0, true);
+          });
+        if (!silent) ctSend({ t: "action", name: "editpage", open: open });
+      }
+      q("#gear").addEventListener("click", function () {
+        setSettings(!settingsOpen);
+      });
+      q("#einst").addEventListener("click", function () {
+        if (activeStyle === "coretools") q("#main").classList.toggle("hidden");
+        ctSend({ t: "action", name: "einstellungen" });
+        /* r148: NEVER hide the full overlay — Einstellungen/D buttons must always stay clickable */
+      });
+      q("#dbtn").addEventListener("click", function () {
+        q("#dbg").classList.toggle("hidden");
+        ctSend({ t: "action", name: "dbutton" });
+      });
+      q("#dbgX").addEventListener("click", function () {
+        q("#dbg").classList.add("hidden");
+        ctSend({ t: "action", name: "close_debug" });
+      });
+      q("#btnExit") && null; /* Exit removed in v10 */
+
+      function sendHits() {
+        try {
+          var d = window.devicePixelRatio || 1;
+          var out = [];
+          ["#main", "#dbg", "#dbtn", "#einst"].forEach(function (sel) {
+            var el = document.querySelector(sel);
+            if (el && !el.classList.contains("hidden")) {
+              var r = el.getBoundingClientRect();
+              out.push(
+                "[" +
+                  Math.round(r.left * d) +
+                  "," +
+                  Math.round(r.top * d) +
+                  "," +
+                  Math.round(r.right * d) +
+                  "," +
+                  Math.round(r.bottom * d) +
+                  "]",
+              );
+            }
+          });
+          var gear = document.querySelector("#gear");
+          if (gear) {
+            var g = gear.getBoundingClientRect();
+            out.push(
+              "[" +
+                Math.round(g.left * d) +
+                "," +
+                Math.round(g.top * d) +
+                "," +
+                Math.round(g.right * d) +
+                "," +
+                Math.round(g.bottom * d) +
+                "]",
+            );
+          }
+          try {
+            CTBridge.post("HIT:[" + out.join(",") + "]");
+          } catch (e) {}
+        } catch (e2) {}
+      }
+      addEventListener("resize", function () {
+        setTimeout(sendHits, 60);
+      });
+      var __uiObs = new MutationObserver(function () {
+        setTimeout(sendHits, 60);
+      });
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          __uiObs.observe(document.body, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["class", "style"],
+          });
+        } catch (e) {}
+        setTimeout(sendHits, 120);
+      });
+      setTimeout(sendHits, 400);
+      ctSend({ t: "ready", ui: "coretools-html-v3" });
+    </script>
+  </body>
+</html>

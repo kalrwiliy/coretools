@@ -1,0 +1,25 @@
+{
+  "name": "coretools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Coretools Frida 17 agent for Brawl Stars in TypeScript",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
+    "typecheck": "tsc --noEmit",
+    "spawn": "frida -U -f com.supercell.brawlstars -l dist/agent.js",
+    "format": "prettier --write src docs README.md webpack.config.js tsconfig.json package.json .prettierrc.json",
+    "format:check": "prettier --check src docs README.md webpack.config.js tsconfig.json package.json .prettierrc.json"
+  },
+  "devDependencies": {
+    "@frida/buffer": "^7.1.0",
+    "@types/frida-gum": "^19.13.0",
+    "frida-java-bridge": "^7.0.13",
+    "prettier": "^3.9.10",
+    "ts-loader": "^9.6.2",
+    "typescript": "^5.9.3",
+    "webpack": "^5.112.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
